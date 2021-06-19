@@ -78,7 +78,7 @@ export default defineComponent({
       );
     };
     init();
-    return { selectAndRead, convert, fil, opt, inpt, pgr };
+    return { selectAndRead, convert, inited, fil, opt, inpt, pgr };
   },
 });
 </script>
