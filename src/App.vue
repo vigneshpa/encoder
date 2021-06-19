@@ -1,17 +1,61 @@
-<template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+<template lang="pug">
+#app
+  h1 Hello World !
+  button(@click="selectAndRead") Select file
+  br
+  | Orginal :
+  video(controls :src="inpt")
+  br
+  button(@click="convert") Convert
+  br
+  | Output :
+  video(controls :src="opt")
+  p
+    | Using
+    a(href="https://ffmpegwasm.github.io/") ffmpegwasm
+    |
+    | library to convert
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import { defineComponent, Ref, ref } from "vue";
+import { createFFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
+import read from "./read";
 
 export default defineComponent({
-  name: 'App',
-  components: {
-    HelloWorld
-  }
+  name: "App",
+  setup() {
+    const ffmpeg = createFFmpeg({
+      log: true,
+      corePath: "./ffmpeg/ffmpeg-core.js",
+    });
+
+    const fil = ref(<File>(<unknown>null));
+    let uint: Uint8Array;
+    const inpt = ref("");
+    const opt = ref("");
+    const inited = ref(false);
+    const init = async () => {
+      await ffmpeg.load();
+      inited.value = true;
+    };
+    const selectAndRead = async () => {
+      const [file, data] = await read();
+      console.log(file);
+      fil.value = file;
+      uint = new Uint8Array(data);
+      inpt.value = URL.createObjectURL(new Blob([uint], {type:fil.value.type}));
+    };
+    const convert = async () => {
+      if (!inited.value)
+        return alert("Cannot convert untill the program is initilisied");
+      ffmpeg.FS("writeFile", fil.value.name, uint);
+      await ffmpeg.run("-i", fil.value.name, "output.mp4");
+      opt.value = URL.createObjectURL(new Blob([ffmpeg.FS("readFile", "output.mp4")], {type:"video/mp4"}));
+    };
+    init();
+    return { selectAndRead, convert, fil , opt, inpt};
+  },
 });
 </script>
 
