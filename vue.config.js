@@ -11,7 +11,7 @@ module.exports = {
     }
   },
   publicPath: ".",
-  outputDir: "dist/public",
+  outputDir: "server/public",
   devServer: {
     port: 3000
   }
