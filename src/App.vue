@@ -92,7 +92,7 @@ export default defineComponent({
   name: "App",
   setup() {
     const converter = new Converter({
-      log: true,
+      log: false,
     });
 
     const convertOptions = ref("-c:v libx264 -preset fast -crf 22 -c:a aac");
