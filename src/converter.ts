@@ -1,4 +1,4 @@
-import { createFFmpeg, CreateFFmpegOptions, FFmpeg } from "@ffmpeg/ffmpeg";
+import { createFFmpeg, CreateFFmpegOptions, FFmpeg , fetchFile} from "@ffmpeg/ffmpeg";
 import { ref, Ref } from "vue";
 
 const selector = document.createElement("input");
@@ -45,7 +45,7 @@ export default class Converter {
         this.ffmpeg.FS(
             "writeFile",
             inptFile.name,
-            new Uint8Array(await inptFile.arrayBuffer())
+            await fetchFile(inptFile)
         );
         await this.ffmpeg.run(
             "-i",
@@ -53,7 +53,7 @@ export default class Converter {
             ...convertOptions.split(/[ ]+/),
             "output.mp4"
         );
-        this.ref.outputFile = new Blob([this.ffmpeg.FS("readFile", "output.mp4")], { type: "video/mp4" });
+        this.ref.outputFile = new Blob([this.ffmpeg.FS("readFile", "output.mp4").buffer], { type: "video/mp4" });
         this.ffmpeg.FS("unlink", "output.mp4");
         this.ffmpeg.FS("unlink", inptFile.name);
     }

@@ -13,7 +13,7 @@
       br
       video(controls, :src="inpt")
     .options
-      h4 Convert Oprions
+      h4 Convertion Options
       input(type="text", v-model="convertOptions", style="width: 250px")
       br
       button(@click="convert", :disabled="!converter.readyToConvert") Convert
@@ -62,6 +62,13 @@ $width: calc(60vmin + 100px);
         min-width: $minWidth;
       }
       overflow: hidden;
+    }
+    button {
+      padding:10px;
+      margin:10px;
+      border-radius: 5px;
+      border:grey solid 1px;
+      background-color:white;
     }
   }
   .headder{
