@@ -33,7 +33,7 @@
 </template>
 
 <style lang="scss">
-$minWidth: 450px;
+$minWidth: 300px;
 $width: 50vmin;
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
