@@ -11,11 +11,14 @@
   br
   button(@click="convert", :disabled="!converter.readyToConvert") Convert
   br
-  progress(max="1", :value="converter.pgr")
-  | {{ (pgr * 100).toFixed(2) }}%
+  progress(max="1", :value="converter.progress")
+  | {{ (typeof converter.progress == "number")?(converter.progress * 100).toFixed(2)+"%":"Loading..." }}
   br
   | Output :
   video(controls, :src="opt")
+  br
+  a( :href="opt" download :disabled="!opt")
+    button(:disabled="!opt") Save File
   p
     | Using
     |
@@ -44,7 +47,7 @@ export default defineComponent({
     const convertOptions = ref("-c:v libx264 -preset fast -crf 22 -c:a aac");
     const selectAndRead = () => converter.selectFile();
     const convert = async () => {
-      if (!converter.ref.readyToConvert.value)
+      if (!converter.ref.readyToConvert)
         return alert("Cannot convert untill the program is ready !");
       try {
         converter.convert(convertOptions.value);
@@ -55,10 +58,14 @@ export default defineComponent({
     };
 
     const inpt = computed((ctx) =>
-      URL.createObjectURL(converter.ref.selectedFile)
+      converter.ref.selectedFile
+        ? URL.createObjectURL(converter.ref.selectedFile)
+        : ""
     );
     const opt = computed((ctx) =>
-      URL.createObjectURL(converter.ref.outputFile)
+      converter.ref.outputFile
+        ? URL.createObjectURL(converter.ref.outputFile)
+        : ""
     );
     return {
       selectAndRead,
@@ -66,7 +73,7 @@ export default defineComponent({
       convertOptions,
       opt,
       inpt,
-      converter:converter.ref
+      converter: converter.ref,
     };
   },
 });

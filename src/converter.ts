@@ -6,37 +6,42 @@ selector.type = "file";
 selector.accept = "video/*";
 
 export default class Converter {
+    private inited: boolean = false;
     constructor(options: CreateFFmpegOptions) {
         options.corePath = "./ffmpeg/ffmpeg-core.js";
         this.ffmpeg = createFFmpeg(options);
-        this.ref = {
-            selectedFile: ref(<File><unknown>null),
-            outputFile: ref(<Blob><unknown>null),
-            progress: ref(0),
+        this.ref = ref({
+            selectedFile: <File><unknown>null,
+            outputFile: <Blob><unknown>null,
+            progress: <number><unknown>null,
             readyToConvert: ref(false),
-        };
-        this.ffmpeg.load();
-        this.ffmpeg.setProgress(pgr => this.ref.progress.value = pgr.ratio);
-        this.ref.readyToConvert.value = true;
+        }).value;
+        this.ffmpeg.load().then(() => {
+            this.inited = true;
+            this.ref.progress = 0;
+            this.ffmpeg.setProgress(pgr => this.ref.progress = pgr.ratio);
+            if(this.ref.selectedFile)this.ref.readyToConvert = true;
+        });
     }
     ffmpeg: FFmpeg;
     ref: {
-        selectedFile: Ref<File>;
-        outputFile: Ref<Blob>;
-        progress: Ref<number>;
-        readyToConvert: Ref<boolean>;
+        selectedFile: File;
+        outputFile: Blob;
+        progress: number;
+        readyToConvert: boolean;
     };
     selectFile(): Promise<File> {
         return new Promise(resolve => {
             selector.onchange = () => {
-                this.ref.selectedFile.value = selector.files![0];
+                this.ref.selectedFile = selector.files![0];
+                if(this.inited)this.ref.readyToConvert = true;
                 resolve(selector.files![0]);
             }
             selector.click();
         });
     }
-    async convert(convertOptions:String) {
-        const inptFile = this.ref.selectedFile.value;
+    async convert(convertOptions: String) {
+        const inptFile = this.ref.selectedFile;
         this.ffmpeg.FS(
             "writeFile",
             inptFile.name,
@@ -48,7 +53,7 @@ export default class Converter {
             ...convertOptions.split(/[ ]+/),
             "output.mp4"
         );
-        this.ref.outputFile.value = new Blob([this.ffmpeg.FS("readFile", "output.mp4")], { type: "video/mp4" });
+        this.ref.outputFile = new Blob([this.ffmpeg.FS("readFile", "output.mp4")], { type: "video/mp4" });
         this.ffmpeg.FS("unlink", "output.mp4");
         this.ffmpeg.FS("unlink", inptFile.name);
     }
