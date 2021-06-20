@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2019",
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
@@ -20,10 +20,11 @@
       ]
     },
     "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
+      "ESNext",
+      "DOM",
+      "DOM.Iterable",
+      "ScriptHost",
+      "ESNext.Array"
     ]
   },
   "include": [
