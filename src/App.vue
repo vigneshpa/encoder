@@ -7,11 +7,11 @@
   video(controls, :src="inpt")
   br
   label Convert Oprions:
-  input(type="text", v-model="convertOptions" style="width:250px;")
+  input(type="text", v-model="convertOptions", style="width: 250px")
   br
-  button(@click="convert", :disabled="!inpt || !inited || running") Convert
+  button(@click="convert", :disabled="!converter.readyToConvert") Convert
   br
-  progress(max="1", :value="pgr")
+  progress(max="1", :value="converter.pgr")
   | {{ (pgr * 100).toFixed(2) }}%
   br
   | Output :
@@ -25,80 +25,48 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import { createFFmpeg } from "@ffmpeg/ffmpeg";
-import read from "./reader";
+import { computed, defineComponent, ref } from "vue";
+import Converter from "./converter";
 
 export default defineComponent({
   name: "App",
   setup() {
-    const ffmpeg = createFFmpeg({
-      log: true,
-      corePath: "./ffmpeg/ffmpeg-core.js",
-    });
-
-    const fil = ref(<File>(<unknown>null));
-    const inpt = ref("");
-    const pgr = ref(0);
-    const opt = ref("");
-    const inited = ref(false);
-    const running = ref(false);
-    const convertOptions = ref("-c:v libx264 -preset fast -crf 22 -c:a aac");
-    const init = async () => {
-      try {
-        await ffmpeg.load();
-      } catch (e) {
-        alert("Cannot initilise\n" + e);
-        return;
-      }
-      inited.value = true;
-      ffmpeg.setProgress(function ({ ratio }) {
-        pgr.value = ratio;
+    let converter: Converter;
+    try {
+      converter = new Converter({
+        log: true,
       });
-    };
-    const selectAndRead = async () => {
-      const file = await read();
-      console.log(file);
-      fil.value = file;
-      inpt.value = URL.createObjectURL(file);
-    };
+    } catch (e) {
+      alert("Cannot load the program\n" + e);
+      throw e;
+    }
+
+    const convertOptions = ref("-c:v libx264 -preset fast -crf 22 -c:a aac");
+    const selectAndRead = () => converter.selectFile();
     const convert = async () => {
-      if (!inited.value)
-        return alert("Cannot convert untill the program is initilisied");
-      running.value = true;
+      if (!converter.ref.readyToConvert.value)
+        return alert("Cannot convert untill the program is ready !");
       try {
-        ffmpeg.FS(
-          "writeFile",
-          fil.value.name,
-          new Uint8Array(await fil.value.arrayBuffer())
-        );
-        await ffmpeg.run(
-          "-i",
-          fil.value.name,
-          ...convertOptions.value.split(/[ ,]+/),
-          "output.mp4"
-        );
-        opt.value = URL.createObjectURL(
-          new Blob([ffmpeg.FS("readFile", "output.mp4")], { type: "video/mp4" })
-        );
-        ffmpeg.FS("unlink", "output.mp4");
-        ffmpeg.FS("unlink", fil.value.name);
+        converter.convert(convertOptions.value);
       } catch (e) {
         alert(e);
+        throw e;
       }
-      running.value = false;
     };
-    init();
+
+    const inpt = computed((ctx) =>
+      URL.createObjectURL(converter.ref.selectedFile)
+    );
+    const opt = computed((ctx) =>
+      URL.createObjectURL(converter.ref.outputFile)
+    );
     return {
       selectAndRead,
       convert,
       convertOptions,
-      inited,
-      fil,
       opt,
       inpt,
-      pgr,
-      running,
+      converter:converter.ref
     };
   },
 });
