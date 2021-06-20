@@ -33,6 +33,8 @@
 </template>
 
 <style lang="scss">
+$minWidth: 450px;
+$width: 50vmin;
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -46,13 +48,16 @@
     div {
       margin: 1vmin auto 1vmin auto;
       background-color: rgb(236, 236, 236);
-      width:50vmin;
-      padding:20px;
-      border-radius:2vmin;
+      width: $width;
+      min-width: $minWidth;
+      padding: 20px;
+      border-radius: 2vmin;
       box-shadow: grey 0px 0px 0.7vmin;
       video {
-        width: 50vmin;
+        width: $width;
+        min-width: $minWidth;
       }
+      overflow: hidden;
     }
   }
 }
