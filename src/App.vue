@@ -64,21 +64,21 @@ $width: calc(60vmin + 100px);
       overflow: hidden;
     }
     button {
-      padding:10px;
-      margin:10px;
+      padding: 10px;
+      margin: 10px;
       border-radius: 5px;
-      border:grey solid 1px;
-      background-color:white;
+      border: grey solid 1px;
+      background-color: white;
     }
   }
-  .headder{
+  .headder {
     font-size: 3em;
-    color:white;
+    color: white;
   }
-  .footer{
-    color:white;
-    a{
-      color:rgb(122, 122, 255);
+  .footer {
+    color: white;
+    a {
+      color: rgb(122, 122, 255);
     }
   }
 }
@@ -100,12 +100,7 @@ export default defineComponent({
     const convert = async () => {
       if (!converter.ref.readyToConvert)
         return alert("Cannot convert untill the program is ready !");
-      try {
-        converter.convert(convertOptions.value);
-      } catch (e) {
-        alert(e);
-        throw e;
-      }
+      converter.convert(convertOptions.value).catch((e) => alert(e));
     };
 
     const inpt = computed((ctx) =>

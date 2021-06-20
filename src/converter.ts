@@ -52,7 +52,7 @@ export default class Converter {
             inptFile.name,
             ...convertOptions.split(/[ ]+/),
             "output.mp4"
-        );
+        ).catch(e=>alert(e));
         this.ref.outputFile = new Blob([this.ffmpeg.FS("readFile", "output.mp4").buffer], { type: "video/mp4" });
         this.ffmpeg.FS("unlink", "output.mp4");
         this.ffmpeg.FS("unlink", inptFile.name);
