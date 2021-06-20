@@ -1,5 +1,6 @@
 .DS_Store
 server/public
+icons
 # node modules
 node_modules
 # lock files
