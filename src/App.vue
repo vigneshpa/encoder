@@ -9,7 +9,7 @@
       br
       video(controls, :src="inpt")
     .options
-      label Convert Oprions:
+      h3 Convert Oprions
       input(type="text", v-model="convertOptions", style="width: 250px")
       br
       button(@click="convert", :disabled="!converter.readyToConvert") Convert
@@ -27,14 +27,14 @@
     p
       | Using
       |
-      a(href="https://ffmpegwasm.github.io/") ffmpegwasm
+      a(href="https://ffmpegwasm.github.io/" target="__blank") ffmpeg.wasm
       |
       | library to convert
 </template>
 
 <style lang="scss">
-$minWidth: 300px;
-$width: 50vmin;
+$minWidth: calc(100vmin - 60px);
+$width: calc(60vmin + 100px);
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -46,6 +46,7 @@ $width: 50vmin;
     display: flex;
     flex-direction: column;
     div {
+      transition: all ease 0.3s;
       margin: 1vmin auto 1vmin auto;
       background-color: rgb(236, 236, 236);
       width: $width;
@@ -70,15 +71,9 @@ import Converter from "./converter";
 export default defineComponent({
   name: "App",
   setup() {
-    let converter: Converter;
-    try {
-      converter = new Converter({
+    const converter = new Converter({
         log: true,
       });
-    } catch (e) {
-      alert("Cannot load the program\n" + e);
-      throw e;
-    }
 
     const convertOptions = ref("-c:v libx264 -preset fast -crf 22 -c:a aac");
     const selectAndRead = () => converter.selectFile();

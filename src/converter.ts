@@ -20,8 +20,8 @@ export default class Converter {
             this.inited = true;
             this.ref.progress = 0;
             this.ffmpeg.setProgress(pgr => this.ref.progress = pgr.ratio);
-            if(this.ref.selectedFile)this.ref.readyToConvert = true;
-        });
+            if (this.ref.selectedFile) this.ref.readyToConvert = true;
+        }).catch(e => alert("Cannot load the converter.\nReason:\n" + e));
     }
     ffmpeg: FFmpeg;
     ref: {
@@ -34,7 +34,7 @@ export default class Converter {
         return new Promise(resolve => {
             selector.onchange = () => {
                 this.ref.selectedFile = selector.files![0];
-                if(this.inited)this.ref.readyToConvert = true;
+                if (this.inited) this.ref.readyToConvert = true;
                 resolve(selector.files![0]);
             }
             selector.click();
