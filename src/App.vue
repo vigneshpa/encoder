@@ -1,15 +1,19 @@
 <template lang="pug">
+.bubbles
+  - var n = 50;
+  while n > 0
+    - n--;
+    .bubble
 #app
-  .headder
-    h1 I Encoder
+  .headder I Encoder
   .content
     .orginal
-      h3 Orginal
+      h4 Orginal
       button(@click="selectAndRead") Select file
       br
       video(controls, :src="inpt")
     .options
-      h3 Convert Oprions
+      h4 Convert Oprions
       input(type="text", v-model="convertOptions", style="width: 250px")
       br
       button(@click="convert", :disabled="!converter.readyToConvert") Convert
@@ -18,21 +22,20 @@
       | {{ typeof converter.progress == 'number' ? (converter.progress * 100).toFixed(2) + '%' : 'Loading...' }}
       br
     .output
-      h3 Output
+      h4 Output
       video(controls, :src="opt")
       br
       a(:href="opt", download, :disabled="!opt")
         button(:disabled="!opt") Save File
   .footer
     p
-      | Using
+      | Built with
       |
-      a(href="https://ffmpegwasm.github.io/" target="__blank") ffmpeg.wasm
-      |
-      | library to convert
+      a(href="https://ffmpegwasm.github.io/", target="__blank") ffmpeg.wasm
 </template>
 
 <style lang="scss">
+@import "@/assets/bubbles.scss";
 $minWidth: calc(100vmin - 60px);
 $width: calc(60vmin + 100px);
 #app {
@@ -48,7 +51,7 @@ $width: calc(60vmin + 100px);
     div {
       transition: all ease 0.3s;
       margin: 1vmin auto 1vmin auto;
-      background-color: rgb(236, 236, 236);
+      background-color: rgba(236, 236, 236, 0.856);
       width: $width;
       min-width: $minWidth;
       padding: 20px;
@@ -59,6 +62,16 @@ $width: calc(60vmin + 100px);
         min-width: $minWidth;
       }
       overflow: hidden;
+    }
+  }
+  .headder{
+    font-size: 3em;
+    color:white;
+  }
+  .footer{
+    color:white;
+    a{
+      color:rgb(122, 122, 255);
     }
   }
 }
@@ -72,8 +85,8 @@ export default defineComponent({
   name: "App",
   setup() {
     const converter = new Converter({
-        log: true,
-      });
+      log: true,
+    });
 
     const convertOptions = ref("-c:v libx264 -preset fast -crf 22 -c:a aac");
     const selectAndRead = () => converter.selectFile();
