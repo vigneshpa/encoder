@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "start": "cd server && node index.js"
   },
   "dependencies": {
     "@ffmpeg/core": "^0.10.0",
