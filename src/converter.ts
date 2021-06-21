@@ -18,7 +18,7 @@ export default class Converter {
         this.ffmpeg = createFFmpeg(options);
         this.ref = ref({
             selectedFile: <File><unknown>null,
-            outputFile: <Blob><unknown>null,
+            outputFile: <File><unknown>null,
             progress: <number><unknown>null,
             readyToConvert: computed(ctx=>(this.prvRef.inited && !this.prvRef.running && !!this.ref.selectedFile)),
         }).value;
@@ -31,7 +31,7 @@ export default class Converter {
     ffmpeg: FFmpeg;
     ref: {
         selectedFile: File;
-        outputFile: Blob;
+        outputFile: File;
         progress: number;
         readyToConvert: boolean;
     };
@@ -44,8 +44,9 @@ export default class Converter {
             selector.click();
         });
     }
-    async convert(convertOptions: String) {
+    async convert(convertOptions: String, outputExtension:string) {
         const inptFile = this.ref.selectedFile;
+        const output = "output"+outputExtension;
         this.prvRef.running = true;
         this.ffmpeg.FS(
             "writeFile",
@@ -56,10 +57,10 @@ export default class Converter {
             "-i",
             inptFile.name,
             ...convertOptions.split(/[ ]+/),
-            "output.mp4"
+            output
         ).catch(e=>alert(e));
-        this.ref.outputFile = new Blob([this.ffmpeg.FS("readFile", "output.mp4").buffer], { type: "video/mp4" });
-        this.ffmpeg.FS("unlink", "output.mp4");
+        this.ref.outputFile = new File([new Blob([this.ffmpeg.FS("readFile", output).buffer])], inptFile.name+outputExtension);
+        this.ffmpeg.FS("unlink", output);
         this.ffmpeg.FS("unlink", inptFile.name);
         this.prvRef.running = false;
     }

@@ -14,7 +14,13 @@
       video(controls, :src="inpt")
     .options
       h4 Convertion Options
-      input(type="text", v-model="convertOptions", style="width: 250px")
+      input(type="text", v-model="convertOptionsStr", style="width: 250px")
+      br
+      label Container:
+      select(v-model="convertOptions.ext")
+        option(value=".mp4") MPEG-4 Part 14 (.mp4)
+        option(value=".mkv") Matroska Container (.mkv)
+        option(value=".mov") QuickTime Format (.mov)
       br
       button(@click="convert", :disabled="!converter.readyToConvert") Convert
       br
@@ -95,12 +101,13 @@ export default defineComponent({
       log: false,
     });
 
-    const convertOptions = ref("-c:v libx264 -preset fast -crf 22 -c:a aac");
+    const convertOptionsStr = ref("-c:v libx264 -preset fast -crf 22 -c:a aac");
+    const convertOptions = ref({ext:".mp4"}).value;
     const selectAndRead = () => converter.selectFile();
     const convert = async () => {
       if (!converter.ref.readyToConvert)
         return alert("Cannot convert untill the program is ready !");
-      converter.convert(convertOptions.value).catch((e) => alert(e));
+      converter.convert(convertOptionsStr.value, convertOptions.ext).catch((e) => alert(e));
     };
 
     const inpt = computed((ctx) =>
@@ -117,6 +124,7 @@ export default defineComponent({
       selectAndRead,
       convert,
       convertOptions,
+      convertOptionsStr,
       opt,
       inpt,
       converter: converter.ref,
