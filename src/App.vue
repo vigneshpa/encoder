@@ -7,34 +7,36 @@
 #app
   .headder I Encoder
   .content
-    .orginal
+    .orginal.contentDiv
       h4 Orginal
       button(@click="selectAndRead") Select file
       br
-      video(controls, :src="inpt")
-    .options
+      transition(name="expand")
+        video(controls, :src="inpt", v-if="inpt")
+    .options.contentDiv
       h4 Convertion Options
-      input(type="text", v-model="convertOptionsStr", style="width: 250px")
-      br
-      label File Format:
-      select(v-model="convertOptions.ext" @change="convertOptionsStr=''")
-        option(value=".mp4") MPEG-4 Part 14 (.mp4)
-        option(value=".mkv") Matroska Container (.mkv)
-        option(value=".mov") QuickTime Format (.mov)
-        option(value=".webm") WebM Format (.webm)
-        option(value=".ogv") Ogg Video Format (.ogv)
-        option(value=".mpeg") MPEG Video Format (.mpeg)
-        option(value=".avi") Audio Video Interleave (.avi)
-        option(value=".3gp") 3GPP file format (.3gp)
-      br
+      .optionsGridContainer
+        label CLI Arguments:
+        input(type="text", v-model="convertOptionsStr")
+        label File Format:
+        select(v-model="convertOptions.ext", @change="convertOptionsStr = ''")
+          option(value=".mp4") MPEG-4 Part 14 (.mp4)
+          option(value=".mkv") Matroska Container (.mkv)
+          option(value=".mov") QuickTime Format (.mov)
+          option(value=".webm") WebM Format (.webm)
+          option(value=".ogv") Ogg Video Format (.ogv)
+          option(value=".mpeg") MPEG Video Format (.mpeg)
+          option(value=".avi") Audio Video Interleave (.avi)
+          option(value=".3gp") 3GPP file format (.3gp)
       button(@click="convert", :disabled="!converter.readyToConvert") Convert
       br
       progress(max="1", :value="converter.progress")
       | {{ typeof converter.progress == 'number' ? (converter.progress * 100).toFixed(2) + '%' : 'Loading...' }}
       br
-    .output
+    .output.contentDiv
       h4 Output
-      video(controls, :src="opt")
+      transition(name="expand")
+        video(controls, :src="opt", v-if="opt")
       br
       a(:href="opt", :download="optName", :disabled="!opt")
         button(:disabled="!opt") Save File
@@ -49,6 +51,17 @@
 @import "@/assets/bubbles.scss";
 $minWidth: calc(100vmin - 60px);
 $width: calc(60vmin + 100px);
+$minVidHeight: calc(50vmin - 30px);
+.expand-enter-active,
+.expand-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  opacity: 0;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -59,7 +72,7 @@ $width: calc(60vmin + 100px);
   .content {
     display: flex;
     flex-direction: column;
-    div {
+    .contentDiv {
       transition: all ease 0.3s;
       margin: 1vmin auto 1vmin auto;
       background-color: rgba(236, 236, 236, 0.856);
@@ -71,8 +84,15 @@ $width: calc(60vmin + 100px);
       video {
         width: $width;
         min-width: $minWidth;
+        min-height: $minVidHeight;
       }
-      overflow: hidden;
+      .optionsGridContainer {
+        display: grid;
+        grid-template-columns: auto auto;
+        label {
+          text-align:right;
+        }
+      }
     }
     button {
       padding: 10px;
