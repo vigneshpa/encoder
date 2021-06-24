@@ -46,6 +46,12 @@ export default class Converter {
     }
     async convert(convertOptions: String, outputExtension:string) {
         const inptFile = this.ref.selectedFile;
+        const name = inptFile.name.substr(0, inptFile.name.lastIndexOf("."))+outputExtension;
+        const mimeTypes = {
+            ".mp4":"video/mp4",
+            ".mov":"video/quicktime",
+            ".mkv":"video/x-matroska"
+        }
         const output = "output"+outputExtension;
         this.prvRef.running = true;
         this.ffmpeg.FS(
@@ -59,7 +65,7 @@ export default class Converter {
             ...convertOptions.split(/[ ]+/),
             output
         ).catch(e=>alert(e));
-        this.ref.outputFile = new File([new Blob([this.ffmpeg.FS("readFile", output).buffer])], inptFile.name+outputExtension);
+        this.ref.outputFile = new File([this.ffmpeg.FS("readFile", output).buffer], name, {lastModified:Date.now(), type:`video/${outputExtension.replace(/\./g, "")}`});
         this.ffmpeg.FS("unlink", output);
         this.ffmpeg.FS("unlink", inptFile.name);
         this.prvRef.running = false;

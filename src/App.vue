@@ -31,7 +31,7 @@
       h4 Output
       video(controls, :src="opt")
       br
-      a(:href="opt", download, :disabled="!opt")
+      a(:href="opt", :download="optName", :disabled="!opt")
         button(:disabled="!opt") Save File
   .footer
     p
@@ -102,12 +102,14 @@ export default defineComponent({
     });
 
     const convertOptionsStr = ref("-c:v libx264 -preset fast -crf 22 -c:a aac");
-    const convertOptions = ref({ext:".mp4"}).value;
+    const convertOptions = ref({ ext: ".mp4" }).value;
     const selectAndRead = () => converter.selectFile();
     const convert = async () => {
       if (!converter.ref.readyToConvert)
         return alert("Cannot convert untill the program is ready !");
-      converter.convert(convertOptionsStr.value, convertOptions.ext).catch((e) => alert(e));
+      converter
+        .convert(convertOptionsStr.value, convertOptions.ext)
+        .catch((e) => alert(e));
     };
 
     const inpt = computed((ctx) =>
@@ -120,6 +122,9 @@ export default defineComponent({
         ? URL.createObjectURL(converter.ref.outputFile)
         : ""
     );
+    const optName = computed((ctx) =>
+      converter.ref.outputFile ? converter.ref.outputFile.name : ""
+    );
     return {
       selectAndRead,
       convert,
@@ -128,6 +133,7 @@ export default defineComponent({
       opt,
       inpt,
       converter: converter.ref,
+      optName
     };
   },
 });
