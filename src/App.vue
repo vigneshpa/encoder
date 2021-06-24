@@ -16,11 +16,16 @@
       h4 Convertion Options
       input(type="text", v-model="convertOptionsStr", style="width: 250px")
       br
-      label Container:
-      select(v-model="convertOptions.ext")
+      label File Format:
+      select(v-model="convertOptions.ext" @change="convertOptionsStr")
         option(value=".mp4") MPEG-4 Part 14 (.mp4)
         option(value=".mkv") Matroska Container (.mkv)
         option(value=".mov") QuickTime Format (.mov)
+        option(value=".webm") WebM Format (.webm)
+        option(value=".ogv") Ogg Video Format (.ogv)
+        option(value=".mpeg") MPEG Video Format (.mpeg)
+        option(value=".avi") Audio Video Interleave (.avi)
+        option(value=".3gp") 3GPP file format (.3gp)
       br
       button(@click="convert", :disabled="!converter.readyToConvert") Convert
       br
@@ -133,7 +138,7 @@ export default defineComponent({
       opt,
       inpt,
       converter: converter.ref,
-      optName
+      optName,
     };
   },
 });

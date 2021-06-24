@@ -1,4 +1,4 @@
-import { createFFmpeg, CreateFFmpegOptions, FFmpeg , fetchFile} from "@ffmpeg/ffmpeg";
+import { createFFmpeg, CreateFFmpegOptions, FFmpeg, fetchFile } from "@ffmpeg/ffmpeg";
 import { computed, ref } from "vue";
 
 const selector = document.createElement("input");
@@ -7,11 +7,11 @@ selector.accept = "video/*";
 
 export default class Converter {
     private prvRef: {
-        inited:boolean;
-        running:boolean;
+        inited: boolean;
+        running: boolean;
     } = ref({
-        inited:false,
-        running:false,
+        inited: false,
+        running: false,
     }).value;
     constructor(options: CreateFFmpegOptions) {
         options.corePath = "./ffmpeg/ffmpeg-core.js";
@@ -20,7 +20,7 @@ export default class Converter {
             selectedFile: <File><unknown>null,
             outputFile: <File><unknown>null,
             progress: <number><unknown>null,
-            readyToConvert: computed(ctx=>(this.prvRef.inited && !this.prvRef.running && !!this.ref.selectedFile)),
+            readyToConvert: computed(ctx => (this.prvRef.inited && !this.prvRef.running && !!this.ref.selectedFile)),
         }).value;
         this.ffmpeg.load().then(() => {
             this.prvRef.inited = true;
@@ -44,15 +44,20 @@ export default class Converter {
             selector.click();
         });
     }
-    async convert(convertOptions: String, outputExtension:string) {
+    async convert(convertOptions: String, outputExtension: string) {
         const inptFile = this.ref.selectedFile;
-        const name = inptFile.name.substr(0, inptFile.name.lastIndexOf("."))+outputExtension;
-        const mimeTypes = {
-            ".mp4":"video/mp4",
-            ".mov":"video/quicktime",
-            ".mkv":"video/x-matroska"
+        const name = inptFile.name.substr(0, inptFile.name.lastIndexOf(".")) + outputExtension;
+        const mimeTypes: { [ext: string]: string } = {
+            ".mp4": "video/mp4",
+            ".mkv": "video/x-matroska",
+            ".webm": "video/webm",
+            ".ogv": "video/ogg",
+            ".mpeg": "video/mpeg",
+            ".avi": "video/x-msvideo",
+            ".mov": "video/quicktime",
+            ".3gp": "video/3gpp"
         }
-        const output = "output"+outputExtension;
+        const output = "output" + outputExtension;
         this.prvRef.running = true;
         this.ffmpeg.FS(
             "writeFile",
@@ -64,8 +69,8 @@ export default class Converter {
             inptFile.name,
             ...convertOptions.split(/[ ]+/),
             output
-        ).catch(e=>alert(e));
-        this.ref.outputFile = new File([this.ffmpeg.FS("readFile", output).buffer], name, {lastModified:Date.now(), type:`video/${outputExtension.replace(/\./g, "")}`});
+        ).catch(e => alert(e));
+        this.ref.outputFile = new File([this.ffmpeg.FS("readFile", output).buffer], name, { lastModified: Date.now(), type: `video/${mimeTypes[outputExtension]}` });
         this.ffmpeg.FS("unlink", output);
         this.ffmpeg.FS("unlink", inptFile.name);
         this.prvRef.running = false;
