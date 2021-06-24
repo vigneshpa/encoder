@@ -17,7 +17,7 @@
       input(type="text", v-model="convertOptionsStr", style="width: 250px")
       br
       label File Format:
-      select(v-model="convertOptions.ext" @change="convertOptionsStr")
+      select(v-model="convertOptions.ext" @change="convertOptionsStr="")
         option(value=".mp4") MPEG-4 Part 14 (.mp4)
         option(value=".mkv") Matroska Container (.mkv)
         option(value=".mov") QuickTime Format (.mov)
